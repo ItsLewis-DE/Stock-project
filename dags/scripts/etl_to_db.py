@@ -2,8 +2,8 @@ from airflow.sdk import DAG
 from airflow.operators.python import PythonOperator
 import json
 import pendulum
-from dags.backend.extract_companies import extract_companies
-from dags.backend.extract_markets import extract_markets
+from dags.backend.extract.extract_companies import extract_companies
+from dags.backend.extract.extract_markets import extract_markets
 default_args = {
     "owner" : 'phongthanh',
 }
