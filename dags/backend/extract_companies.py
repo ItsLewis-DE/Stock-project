@@ -6,18 +6,18 @@ from dotenv import load_dotenv
 
 def extract_companies():
     logger = logging.getLogger(__name__)
-    load_dotenv('/usr/local/env')
+    load_dotenv('/usr/local/.env')
     exchanges = ['NYSE', 'NASDAQ', 'NYSEMKT', 'NYSEARCA', 'OTC', 'BATS', 'INDEX']
     result = []
     total =0
     for exchange in exchanges:
         try:
             params = {
-                'exchange': exchange,
                 'token': os.getenv('API_COMPANIES')
             }
-            url = 'https://api.sec-api.io/mapping/exchange/nasdaq?token=YOUR_API_KEY'
-            response = requests.get(url,params = params,retry = 30)
+            url = f'https://api.sec-api.io/mapping/exchange/{exchange}'
+            logger.info("Extracting data......")
+            response = requests.get(url,params = params,timeout = 30)
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.RequestException as e:
@@ -25,8 +25,9 @@ def extract_companies():
             raise
         result.extend(data)
         total += len(data)
-    date = pendulum.now(tz='Aisa/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
     path = f'/usr/local/data/raw/companies/raw_companies_{date}.json'
+    os.makedirs(os.path.dirname(path),exist_ok=True)
     with open(path,'w',encoding = 'utf-8') as file:
         json.dump(result,file,indent=2)
-    logging.info(f"Extracting {total} successffuly!")
+    logger.info(f"Extracting {total} successffuly!")

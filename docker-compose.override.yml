@@ -1,0 +1,49 @@
+services:
+  api-server:
+    volumes:
+      - ./data:/usr/local/data
+      - ./.env:/usr/local/.env
+      - ./elt_data:/usr/local/elt_data
+    depends_on:
+      - my_new_postgres
+    networks:
+      - airflow
+  scheduler:
+    volumes:
+      - ./data:/usr/local/data
+      - ./.env:/usr/local/.env
+      - ./elt_data:/usr/local/elt_data
+    depends_on:
+      - my_new_postgres
+    networks:
+      - airflow
+  triggerer:
+    volumes:
+      - ./data:/usr/local/data
+      - ./.env:/usr/local/.env
+      - ./elt_data:/usr/local/elt_data
+    networks:
+      - airflow
+  dag-processor:
+    volumes:
+      - ./data:/usr/local/data
+      - ./.env:/usr/local/.env
+      - ./elt_data:/usr/local/elt_data
+    networks:
+      - airflow
+
+  my_new_postgres:
+    image: postgres:15
+    container_name: my_new_postgres
+    environment:
+      POSTGRES_USER: phongthanh
+      POSTGRES_PASSWORD: thangkhung0993
+      POSTGRES_DB: stock_db
+    ports:
+      - "5433:5432"
+    networks:
+      - airflow
+
+networks:
+  airflow:
+    driver: bridge
