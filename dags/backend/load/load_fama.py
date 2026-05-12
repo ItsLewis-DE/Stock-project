@@ -28,7 +28,7 @@ def read_newest_file(dirpath,extension):
 def trans_dataframe(df):
     return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna()
 
-def load_data_into_db(data_json,table_name,columns,schema):
+def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
     logger = logging.getLogger(__name__)
     logger.info("Connecting db....")
     conn = psycopg2.connect(
@@ -41,11 +41,15 @@ def load_data_into_db(data_json,table_name,columns,schema):
     logger.info("Connect succesfully !!")
     placeholders = ','.join(['%s'] * len(columns))
     columns_string = ', '.join(columns)
+    updated_string = ', '.join(
+        [f"{col} = EXCLUDED.{col}" for col in columns]
+    )
     query = f"""
         INSERT INTO {schema}.{table_name} ({columns_string})
         VALUES ({placeholders})
-        ON CONFLICT
+        ON CONFLICT ({col_conflict})
         DO UPDATE SET
+            {updated_string}
         """
     cursor = conn.cursor()
     for line in data_json:
@@ -57,9 +61,23 @@ def load_fama():
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
     extension = '.json'
+
+    # fama table
     dirpath = '/usr/local/data/processed/fama_classification'
-    newest_file = read_newest_file(dirpath,extension)
-    with open(newest_file,"r") as file:
+    fama_file = read_newest_file(dirpath,extension)
+    with open(fama_file,"r") as file:
         data = [json.loads(line) for line in file if line.strip()]
     schema = 'stock_schema'
-    load_data_into_db(data,'fama_classification',['fama_industry','fama_sector'],schema)
+    col_conflict = 'fama_industry'
+    load_data_into_db(data,'fama_classification',['fama_industry','fama_sector'],schema,col_conflict)
+
+    #industry table
+
+    dirpath = '/usr/local/data/processed/industry'
+    industry_file = read_newest_file(dirpath,extension)
+    with open(industry_file,'r') as file:
+        data = [json.loads(line) for line in file if line.strip()]
+    schema = 'stock_schema'
+    col_conflict = 'industry_name'
+    load_data_into_db(data,'industry',['industry_name','sector_name'],schema,col_conflict)        
+

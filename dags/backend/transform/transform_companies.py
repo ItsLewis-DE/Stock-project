@@ -31,51 +31,23 @@ def df_to_file(df,dirname,filename):
     dirname.mkdir(parents=True,exist_ok=True)
     df.to_json(f'{dirname}/{filename}_{date}.json',orient='records',lines=True)
     logger.info("Saved to file successfully!")
-def transform_company():
+def transform_to_db():
     dirpath = '/usr/local/data/raw/companies'
     extension = '.json'
     newest_file = read_newest_file(dirpath,extension)
-    with open(newest_file,"r") as file:
-        data = json.load(file)
-    name = []
-    ticker = []
-    cik=[]
-    cusip=[]
-    exchange=[]
-    isDelisted=[]
-    category=[]
-    sector=[]
-    industry=[]
-    sic=[]
-    sicSector=[]
-    sicIndustry=[]
-    famaSector=[]
-    famaIndustry=[]
-    currency=[]
-    location=[]
-    for record in data:
-        name.append(record['name'])
-        ticker.append(record['ticker'])
-        cik.append(record['cik'])
-        cusip.append(record['cusip'])
-        exchange.append(record['exchange'])
-        isDelisted.append(record['isDelisted'])
-        category.append(record['category'])
-        sector.append(record['sector'])
-        industry.append(record['industry'])
-        sic.append(record['sic'])
-        sicSector.append(record['sicSector'])
-        sicIndustry.append(record['sicIndustry'])
-        famaSector.append(record['famaSector'])
-        famaIndustry.append(record['famaIndustry'])
-        currency.append(record['currency'])
-        location.append(record['location'])
-
-    df_fama_classification = trans_dataframe(pd.DataFrame(
-        {
-            'fama_industry':famaIndustry,
-            'fama_sector':famaSector
-        }
-    ))
+    df = pd.read_json(newest_file)
+    df_fama = trans_dataframe(df[['famaIndustry','famaSector']])
+    df_fama = df.rename(columns={
+        'famaIndustry':'fama_industry',
+        'famaSector':'fama_sector'
+    })
     dirname = '/usr/local/data/processed/fama_classification'
-    df_to_file(df_fama_classification,dirname,'fama_processed')
+    df_to_file(df_fama,dirname,'fama_processed')
+    df_industry = trans_dataframe(df[['industry','sector']])
+    df_industry = df_industry.rename(columns={
+        'industry':'industry_name',
+        'sector':'sector_name'
+    })
+    dirname = '/usr/local/data/processed/industry'
+    df_to_file(df_industry,dirname,'industry_processed')
+
