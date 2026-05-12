@@ -5,6 +5,7 @@ import pendulum
 from dags.backend.extract.extract_companies import extract_companies
 from dags.backend.extract.extract_markets import extract_markets
 from dags.backend.transform.transform_companies import transform_company
+from dags.backend.load.load_fama import load_fama
 default_args = {
     "owner" : 'phongthanh',
 }
@@ -24,7 +25,11 @@ with DAG (
     #     task_id = 'extract_markets',
     #     python_callable=extract_markets
     # )
-    transform_company_task = PythonOperator(
-        task_id ='transform_company',
-        python_callable = transform_company
+    # transform_company_task = PythonOperator(
+    #     task_id ='transform_company',
+    #     python_callable = transform_company
+    # )
+    load_fama_task = PythonOperator(
+        task_id = 'load_fama',
+        python_callable = load_fama
     )

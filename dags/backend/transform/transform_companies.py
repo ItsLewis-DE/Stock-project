@@ -23,7 +23,7 @@ def read_newest_file(dirpath,extension):
     )
     return newest_file
 def trans_dataframe(df):
-    return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna()
+    return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(how='all')
 def df_to_file(df,dirname,filename):
     logger = logging.getLogger(__name__)
     date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
@@ -71,21 +71,11 @@ def transform_company():
         currency.append(record['currency'])
         location.append(record['location'])
 
-    df_company = trans_dataframe(pd.DataFrame( 
+    df_fama_classification = trans_dataframe(pd.DataFrame(
         {
-        'company_name': name,
-        'ticker':ticker,
-        'cik':cik,
-        'cusip':cusip,
-        'isDelisted':isDelisted,
-        'location':location,
-        'category':category,
-        'currency':currency,
-        'sic':sic
-    }
+            'fama_industry':famaIndustry,
+            'fama_sector':famaSector
+        }
     ))
-    path_to_save='/usr/local/data/processed'
-    df_to_file(df_company,path_to_save,'company')
-    
-
-
+    dirname = '/usr/local/data/processed/fama_classification'
+    df_to_file(df_fama_classification,dirname,'fama_processed')
