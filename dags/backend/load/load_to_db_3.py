@@ -58,6 +58,7 @@ def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
     cursor = conn.cursor()
     values = [tuple(line[col] for col in columns) for line in data_json]
     cursor.executemany(query,values)
+    logger.info("Load data to database succefully!!")
     conn.commit()
     cursor.close()
     conn.close()

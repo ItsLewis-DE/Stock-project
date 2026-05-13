@@ -35,6 +35,8 @@ def df_to_file(df,dirname,filename):
     logger.info("Saved to file successfully!")
 
 def trans_to_db_3():
+    #exchange table
+    logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
     dirpath = '/usr/local/data/raw/markets'
     extension = '.json'
@@ -54,7 +56,7 @@ def trans_to_db_3():
     host = os.getenv("POSTGRES_HOST")
     port = os.getenv("POSTGRES_PORT")
     db = os.getenv("POSTGRES_DB")
-
+    logger.info("Connecting to database!!")
     db_url = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{db}"
     engine = create_engine(db_url)
     query = " SELECT * FROM stock_schema.region"

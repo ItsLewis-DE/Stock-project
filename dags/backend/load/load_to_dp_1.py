@@ -56,10 +56,12 @@ def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
             {updated_string}
         """
     cursor = conn.cursor()
-    for line in data_json:
-        values = tuple(line[col] for col in columns)
-        cursor.execute(query,values)
+    values = [tuple(line[col] for col in columns) for line in data_json]
+    cursor.executemany(query,values)
+    logger.info("Load data to database succefully!!")
     conn.commit()
+    cursor.close()
+    conn.close()
 
 def load_to_db_1():
     logger = logging.getLogger(__name__)

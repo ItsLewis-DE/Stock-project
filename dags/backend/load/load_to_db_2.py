@@ -58,15 +58,32 @@ def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
     cursor = conn.cursor()
     values = [tuple(line[col] for col in columns) for line in data_json]
     cursor.executemany(query,values)
+    logger.info("Load data to database succefully!!")
     conn.commit()
     cursor.close()
     conn.close()
 def load_to_db_2():
+    #load region table
     dirpath = '/usr/local/data/processed/region'
     extension = '.json'
     region_processed_newest = read_newest_file(dirpath,extension)
     with open(region_processed_newest,'r') as file:
         data = [json.loads(line) for line in file if file]
-    load_data_into_db(data,'region',['region_name','market_type','local_open','local_close'],'stock_schema',['region_name'])
+    table_name = 'region'
+    columns = ['region_name','market_type','local_open','local_close']
+    schema = 'stock_schema'
+    col_conflict = ['region_name']
+    load_data_into_db(data,table_name,columns,schema,col_conflict)
+    #load sic table
+    dirpath = '/usr/local/data/processed/sic'
+    extension = '.json'
+    sic_processed_newest = read_newest_file(dirpath,extension)
+    with open(sic_processed_newest,'r') as file:
+        data = [json.loads(line) for line in file]
+    table_name = 'sic_classification'
+    columns = ['sic_code','fama_id','sic_industry','sic_sector']
+    schema = 'stock_schema'
+    col_conflict = ['sic_code']
+    load_data_into_db(data,table_name,columns,schema,col_conflict)
 
     
