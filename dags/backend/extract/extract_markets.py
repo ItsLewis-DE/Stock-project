@@ -21,7 +21,7 @@ def extract_markets():
         logger.info("Extracting data successfully!")
     except requests.exceptions.RequestException as e:
         logger.exception(f"There is an error while extracting data from API : {e}")
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh')
+    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
     path = f'/usr/local/data/raw/markets/raw_markets_{date}.json'
     os.makedirs(os.path.dirname(path),exist_ok=True)
     with open(path,"w",encoding = 'utf-8') as file:
