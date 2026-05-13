@@ -39,6 +39,11 @@ def transform_to_db_2():
     region_df = trans_dataframe(
         market_df[['region','market_type','local_open','local_close']]
     )
+    region_df = region_df.rename(columns = 
+        {
+            'region':'region_name'
+        }
+    )
     path_to_file = '/usr/local/data/processed/region'
     filename = 'region_processed'
     df_to_file(region_df,path_to_file,filename)

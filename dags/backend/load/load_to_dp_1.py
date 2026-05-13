@@ -29,6 +29,7 @@ def trans_dataframe(df):
     return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna()
 
 def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
+    load_dotenv('/usr/local/.env')
     logger = logging.getLogger(__name__)
     logger.info("Connecting db....")
     conn = psycopg2.connect(
@@ -44,10 +45,13 @@ def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
     updated_string = ', '.join(
         [f"{col} = EXCLUDED.{col}" for col in columns]
     )
+    conflict_string = ', '.join(
+        [f"{col}" for col in col_conflict]
+    )
     query = f"""
         INSERT INTO {schema}.{table_name} ({columns_string})
         VALUES ({placeholders})
-        ON CONFLICT ({col_conflict})
+        ON CONFLICT ({conflict_string})
         DO UPDATE SET
             {updated_string}
         """
@@ -57,7 +61,7 @@ def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
         cursor.execute(query,values)
     conn.commit()
 
-def load_fama():
+def load_to_db_1():
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
     extension = '.json'
@@ -68,7 +72,7 @@ def load_fama():
     with open(fama_file,"r") as file:
         data = [json.loads(line) for line in file if line.strip()]
     schema = 'stock_schema'
-    col_conflict = 'fama_industry'
+    col_conflict = ['fama_industry']
     load_data_into_db(data,'fama_classification',['fama_industry','fama_sector'],schema,col_conflict)
 
     #industry table
@@ -78,6 +82,6 @@ def load_fama():
     with open(industry_file,'r') as file:
         data = [json.loads(line) for line in file if line.strip()]
     schema = 'stock_schema'
-    col_conflict = 'industry_name'
+    col_conflict = ['industry_name']
     load_data_into_db(data,'industry',['industry_name','sector_name'],schema,col_conflict)        
 
