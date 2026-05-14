@@ -26,7 +26,7 @@ def read_newest_file(dirpath,extension):
     return newest_file
 
 def trans_dataframe(df):
-    return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna()
+    return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(subset = ['cik','ticker'])
 
 def load_data_into_db(data_json,table_name,columns,schema,col_conflict):
     load_dotenv('/usr/local/.env')
@@ -71,5 +71,5 @@ def load_to_db_4():
     table_name = 'company'
     columns = ['company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']
     schema = 'stock_schema'
-    col_conflict = ['cik']
+    col_conflict = ['cik','ticker']
     load_data_into_db(data,table_name,columns,schema,col_conflict)

@@ -24,8 +24,8 @@ def read_newest_file(dirpath,extension):
         key = lambda file : file.stat().st_mtime
     )
     return newest_file
-def trans_dataframe(df):
-    return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(how='all')
+def trans_dataframe(df,col_conflict):
+    return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(subset=(col_conflict))
 def df_to_file(df,dirname,filename):
     logger = logging.getLogger(__name__)
     date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
@@ -40,7 +40,6 @@ def trans_to_db_4():
     extension = '.json'
     newest_file_comapnies = read_newest_file(dirpath,extension)
     df_company = pd.read_json(newest_file_comapnies)
-    df_company = trans_dataframe(df_company[['name','industry','ticker','cik','sic','cusip','isDelisted','location','currency','category','exchange']])
     df_company = df_company.rename(columns = {
         'name':'company_name',
         'exchange':'exchange_name',
@@ -69,5 +68,6 @@ def trans_to_db_4():
     df_company = pd.merge(df_company,exchange_df,on = 'exchange_name',how='inner')
     df_company = pd.merge(df_company,industry_df,on='industry_name',how='inner')
     df_company = pd.merge(df_company,sic_df,on='sic_code',how='inner')
-    df_company = df_company[['company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']]
+    col_conflict = ['cik','ticker']
+    df_company = trans_dataframe(df_company[['company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']],col_conflict)
     df_to_file(df_company,path_to_save,file_name)

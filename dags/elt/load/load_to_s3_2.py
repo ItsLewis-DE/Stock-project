@@ -43,48 +43,48 @@ def load_parquet_to_s3(dirpath,filename,extension):
     s3.upload_file(
         parquet_newest_file,
         'stock-bucket-phong-2026',
-        f'parquet/{filename}_{date}.parquet'
+        f'parquet/{filename}/{date}/{filename}.parquet'
     )
     logger.info("Parquet saved to S3")
 def load_to_s3_2():
     # #company file
-    # dirpath = '/usr/local/data/parquet/company'
-    # extension = '.parquet'
-    # filename = 'company_parquet'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    dirpath = '/usr/local/data/parquet/company'
+    extension = '.parquet'
+    filename = 'company'
+    load_parquet_to_s3(dirpath,filename,extension)
     
     #exchange file
     dirpath = '/usr/local/data/parquet/exchange'
     extension = '.parquet'
-    filename = 'exchange_parquet'
+    filename = 'exchange'
     load_parquet_to_s3(dirpath,filename,extension)
 
     #fama_classification
     dirpath = '/usr/local/data/parquet/fama_classification'
     extension = '.parquet'
-    filename = 'fama_classification_parquet'
+    filename = 'fama_classification'
     load_parquet_to_s3(dirpath,filename,extension)
 
     #industry file
     dirpath = '/usr/local/data/parquet/company'
     extension = '.parquet'
-    filename = 'industry_parquet'
+    filename = 'industry'
     load_parquet_to_s3(dirpath,filename,extension)
 
     #news file
     dirpath = '/usr/local/data/parquet/news'
     extension = '.parquet'
-    filename = 'news_parquet'
+    filename = 'news'
     load_parquet_to_s3(dirpath,filename,extension)
 
     #ohlc file
     dirpath = '/usr/local/data/parquet/ohlc'
     extension = '.parquet'
-    filename = 'ohlc_parquet'
+    filename = 'ohlc'
     load_parquet_to_s3(dirpath,filename,extension)
 
     #region
     dirpath = '/usr/local/data/parquet/region'
     extension = '.parquet'
-    filename = 'region_parquet'
+    filename = 'region'
     load_parquet_to_s3(dirpath,filename,extension)

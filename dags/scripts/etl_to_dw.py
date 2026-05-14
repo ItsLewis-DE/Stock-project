@@ -6,6 +6,7 @@ from dags.elt.extract.extract_news import extract_news
 from dags.elt.extract.extract_ohlc import extract_ohlc
 from dags.elt.load.load_to_s3_1 import load_to_s3_1
 from dags.elt.load.load_to_s3_2 import load_to_s3_2
+from dags.elt.transform.transform_parquet_1 import transform_parquet_1
 default_args = {
     "owner" : 'phongthanh',
 }
@@ -25,11 +26,16 @@ with DAG (
     #     task_id = 'extract_ohlc_task',
     #     python_callable = extract_ohlc
     # )
-    # load_to_s3_1_task = PythonOperator(
-    #     task_id = 'load_to_s3_1_task',
-    #     python_callable = load_to_s3_1
-    # )
+    load_to_s3_1_task = PythonOperator(
+        task_id = 'load_to_s3_1_task',
+        python_callable = load_to_s3_1
+    )
     load_to_s3_2_task = PythonOperator(
         task_id='load_to_s3_2_task',
         python_callable = load_to_s3_2
     )
+    transform_to_parquet_1_task = PythonOperator(
+        task_id = 'transform_to_parquet_1_task',
+        python_callable = transform_parquet_1
+    )
+    load_to_s3_1_task >> load_to_s3_2_task >> transform_to_parquet_1_task
