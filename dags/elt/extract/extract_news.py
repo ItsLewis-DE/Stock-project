@@ -14,7 +14,7 @@ def extract_timezone(timezone):
         time_from = yesterday.strftime("%Y%m%dT" + "1000")
         time_to = yesterday.strftime("%Y%m%dT" + "2359")
     return time_from,time_to
-def save_data_to_file(dirpath,data,filename):
+def save_data_to_file(dirpath,data,filename,total):
     logger = logging.getLogger(__name__)
     date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime('%Y_%m_%d')
     dirpath = Path(dirpath)
@@ -22,12 +22,13 @@ def save_data_to_file(dirpath,data,filename):
     filepath = dirpath/f"{filename}_{date}.json"
     with open(filepath,'w',encoding = 'utf-8') as file:
         json.dump(data,file,indent=2)
-    logger.info("Saved data to file successfully!")
+    logger.info(f"Saved {total} to file successfully!")
 def extract_news():
     logger = logging.getLogger(__name__)
     yesterday = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=1)
     load_dotenv('/usr/local/.env')
     data_json = []
+    total = 0
     for timezone in [1,2]:
         time_from,time_to = extract_timezone(timezone)
         params = {
@@ -47,9 +48,10 @@ def extract_news():
         except requests.exceptions.RequestException as e:
             logger.exception(f"There is an error while extracting data from API: {e}")
             raise
+        total +=len(data_json)
         time.sleep(5)
     logger.info("Succesfully")
     dirpath = '/usr/local/data/raw/news'
     filename = 'raw_news'
-    save_data_to_file(dirpath,data_json,filename)
+    save_data_to_file(dirpath,data_json,filename,total)
     

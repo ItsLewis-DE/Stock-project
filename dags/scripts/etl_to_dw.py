@@ -3,6 +3,8 @@ from airflow.operators.python import PythonOperator
 import json
 import pendulum
 from dags.elt.extract.extract_news import extract_news
+from dags.elt.extract.extract_ohlc import extract_ohlc
+from dags.elt.load.load_to_s3_1 import load_to_s3_1
 default_args = {
     "owner" : 'phongthanh',
 }
@@ -14,7 +16,15 @@ with DAG (
     start_date = pendulum.datetime(2025,1,1,tz='Asia/Ho_Chi_Minh'),
     catchup = False
 ) as dag:
-    extract_news_task = PythonOperator(
-        task_id = 'extract_news_task',
-        python_callable = extract_news
+    # extract_news_task = PythonOperator(
+    #     task_id = 'extract_news_task',
+    #     python_callable = extract_news
+    # )
+    # extract_ohlc_task = PythonOperator(
+    #     task_id = 'extract_ohlc_task',
+    #     python_callable = extract_ohlc
+    # )
+    load_to_s3_1_task = PythonOperator(
+        task_id = 'load_to_s3_1_task',
+        python_callable = load_to_s3_1
     )
