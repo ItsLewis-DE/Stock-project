@@ -1,5 +1,6 @@
 from airflow.sdk import DAG
 from airflow.operators.python import PythonOperator
+from airflow.utils.task_group import TaskGroup
 import json
 import pendulum
 from dags.elt.extract.extract_news import extract_news
@@ -18,24 +19,30 @@ with DAG (
     start_date = pendulum.datetime(2025,1,1,tz='Asia/Ho_Chi_Minh'),
     catchup = False
 ) as dag:
-    # extract_news_task = PythonOperator(
-    #     task_id = 'extract_news_task',
-    #     python_callable = extract_news
-    # )
-    # extract_ohlc_task = PythonOperator(
-    #     task_id = 'extract_ohlc_task',
-    #     python_callable = extract_ohlc
-    # )
-    # load_to_s3_1_task = PythonOperator(
-    #     task_id = 'load_to_s3_1_task',
-    #     python_callable = load_to_s3_1
-    # )
-    # load_to_s3_2_task = PythonOperator(
-    #     task_id='load_to_s3_2_task',
-    #     python_callable = load_to_s3_2
-    # )
-    transform_to_parquet_1_task = PythonOperator(
-        task_id = 'transform_to_parquet_1_task',
-        python_callable = transform_parquet_1
-    )
-    # load_to_s3_1_task >> load_to_s3_2_task >> transform_to_parquet_1_task
+    with TaskGroup(group_id="extract_phase") as extract_group:
+        extract_news_task = PythonOperator(
+            task_id = 'extract_news_task',
+            python_callable = extract_news
+        )
+        extract_ohlc_task = PythonOperator(
+            task_id = 'extract_ohlc_task',
+            python_callable = extract_ohlc
+        )
+        [extract_news_task,extract_ohlc_task]
+    with TaskGroup(group_id="load_phase") as load_group:
+        load_to_s3_1_task = PythonOperator(
+            task_id = 'load_to_s3_1_task',
+            python_callable = load_to_s3_1
+        )
+        load_to_s3_2_task = PythonOperator(
+            task_id='load_to_s3_2_task',
+            python_callable = load_to_s3_2
+        )
+        load_to_s3_1_task >> load_to_s3_2_task 
+    with TaskGroup(group_id="transform_phase") as transform_group:
+        transform_to_parquet_1_task = PythonOperator(
+            task_id = 'transform_to_parquet_1_task',
+            python_callable = transform_parquet_1
+        )
+        transform_to_parquet_1_task
+    extract_group >> load_group >> transform_group

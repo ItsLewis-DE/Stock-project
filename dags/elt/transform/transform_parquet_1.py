@@ -74,35 +74,35 @@ def trans_par(tablename,columns,col_conflict):
     conn.close()
 
 def transform_parquet_1():
-    # #trans table company
-    # tablename = 'company'
-    # col_conflict = ['ticker','cik']
-    # columns = ['company_id','company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']
-    # trans_par(tablename,columns,col_conflict)
+    #trans table company
+    tablename = 'company'
+    col_conflict = ['ticker','cik']
+    columns = ['company_id','company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']
+    trans_par(tablename,columns,col_conflict)
 
-    # #trans table exchange
-    # tablename = 'exchange'
-    # col_conflict = ['exchange_name']
-    # columns = ['exchange_id','exchange_name','region_id']
-    # trans_par(tablename,columns,col_conflict)
+    #trans table exchange
+    tablename = 'exchange'
+    col_conflict = ['exchange_name']
+    columns = ['exchange_id','exchange_name','region_id']
+    trans_par(tablename,columns,col_conflict)
 
-    #trans table fama_classification
-    # tablename = 'fama_classification'
-    # columns = ['fama_id','fama_industry','fama_sector']
-    # col_conflict = ['fama_industry','fama_sector']
-    # trans_par(tablename,columns,col_conflict)
+    # trans table fama_classification
+    tablename = 'fama_classification'
+    columns = ['fama_id','fama_industry','fama_sector']
+    col_conflict = ['fama_industry','fama_sector']
+    trans_par(tablename,columns,col_conflict)
 
-    # #trans table industry
-    # tablename = 'industry'
-    # columns = ['industry_id','industry_name','sector_name']
-    # col_conflict = ['industry_name']
-    # trans_par(tablename,columns,col_conflict)
+    #trans table industry
+    tablename = 'industry'
+    columns = ['industry_id','industry_name','sector_name']
+    col_conflict = ['industry_name']
+    trans_par(tablename,columns,col_conflict)
 
-    # #trans table news
-    # tablename = 'news'
-    # columns = ['title','url','time_published','authors','summary','banner_image','source','category_within_source','source_domain','topics','overall_sentiment_score','overall_sentiment_label','ticker_sentiment']
-    # col_conflict = ['title']
-    # trans_par(tablename,columns,col_conflict)
+    #trans table news
+    tablename = 'news'
+    columns = ['title','url','time_published','authors','summary','banner_image','source','category_within_source','source_domain','topics','overall_sentiment_score','overall_sentiment_label','ticker_sentiment']
+    col_conflict = ['title']
+    trans_par(tablename,columns,col_conflict)
 
     # #trans table ohlc
     tablename = 'ohlc'
