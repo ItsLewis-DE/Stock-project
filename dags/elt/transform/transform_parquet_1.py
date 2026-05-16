@@ -14,7 +14,7 @@ import snowflake.connector
 def trans_par(tablename,columns,col_conflict):
     load_dotenv('/usr/local/.env')
     logger = logging.getLogger(__name__)
-    current_date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    current_date = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=1).strftime("%Y_%m_%d")
     logger.info("Connecting to snowflake!")
     conn = snowflake.connector.connect(
         user=os.getenv("SNOWFLAKE_USER"),
@@ -80,32 +80,32 @@ def transform_parquet_1():
     columns = ['company_id','company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']
     trans_par(tablename,columns,col_conflict)
 
-    #trans table exchange
-    tablename = 'exchange'
-    col_conflict = ['exchange_name']
-    columns = ['exchange_id','exchange_name','region_id']
-    trans_par(tablename,columns,col_conflict)
+    # #trans table exchange
+    # tablename = 'exchange'
+    # col_conflict = ['exchange_name']
+    # columns = ['exchange_id','exchange_name','region_id']
+    # trans_par(tablename,columns,col_conflict)
 
-    # trans table fama_classification
-    tablename = 'fama_classification'
-    columns = ['fama_id','fama_industry','fama_sector']
-    col_conflict = ['fama_industry','fama_sector']
-    trans_par(tablename,columns,col_conflict)
+    # # trans table fama_classification
+    # tablename = 'fama_classification'
+    # columns = ['fama_id','fama_industry','fama_sector']
+    # col_conflict = ['fama_industry','fama_sector']
+    # trans_par(tablename,columns,col_conflict)
 
-    #trans table industry
-    tablename = 'industry'
-    columns = ['industry_id','industry_name','sector_name']
-    col_conflict = ['industry_name']
-    trans_par(tablename,columns,col_conflict)
+    # #trans table industry
+    # tablename = 'industry'
+    # columns = ['industry_id','industry_name','sector_name']
+    # col_conflict = ['industry_name']
+    # trans_par(tablename,columns,col_conflict)
 
-    #trans table news
-    tablename = 'news'
-    columns = ['title','url','time_published','authors','summary','banner_image','source','category_within_source','source_domain','topics','overall_sentiment_score','overall_sentiment_label','ticker_sentiment']
-    col_conflict = ['title']
-    trans_par(tablename,columns,col_conflict)
+    # #trans table news
+    # tablename = 'news'
+    # columns = ['title','url','time_published','authors','summary','banner_image','source','category_within_source','source_domain','topics','overall_sentiment_score','overall_sentiment_label','ticker_sentiment']
+    # col_conflict = ['title']
+    # trans_par(tablename,columns,col_conflict)
 
-    # #trans table ohlc
-    tablename = 'ohlc'
-    columns = ['T','v','vw','o','c','h','l','t_time','n']
-    col_conflict = ['T','t_time']
-    trans_par(tablename,columns,col_conflict)
+    # # #trans table ohlc
+    # tablename = 'ohlc'
+    # columns = ['T','v','vw','o','c','h','l','t_time','n']
+    # col_conflict = ['T','t_time']
+    # trans_par(tablename,columns,col_conflict)
