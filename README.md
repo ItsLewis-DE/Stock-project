@@ -213,6 +213,3 @@ dbt test
 5. **Tác Động Tâm Lý Đến Giá (Sentiment Price Impact)**: Biểu đồ phân tán (Scatter Plot) phân tích mức độ tương quan thực tế giữa tin tức báo chí và sự biến động giá cổ phiếu.
 
 ---
-
-## 👨‍💻 Tác giả & Đóng góp
-Dự án được phát triển và duy trì bởi nhóm Kỹ sư Dữ liệu (**Data Engineers**). Mọi đóng góp, sửa lỗi hoặc đề xuất tính năng mới vui lòng gửi Pull Request hoặc tạo Issue trên kho lưu trữ của dự án.
