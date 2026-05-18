@@ -31,6 +31,12 @@ services:
       - ./elt_data:/usr/local/elt_data
     networks:
       - airflow
+  streamlit:
+    build: ./streamlit
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlit:/app
 
   my_new_postgres:
     image: postgres:15
