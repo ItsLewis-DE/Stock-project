@@ -32,14 +32,6 @@ class Background_colors:
 def verbose_output(message: str) -> None:
     if VERBOSE:
         print(f"{message}{Background_colors.END}")
-conn = snowflake.connector.connect(
-    user="SNOWFLAKE_USER",
-    password="SNOWFLAKE_PASSWORD",
-    account="SNOWFLAKE_ACCOUNT",
-    warehouse="SNOWFLAKE_WAREHOUSE",
-    DATABASE="SNOWFLAKE_DATABASE",
-    SCHEMA="SNOWFLAKE_SCHEMA"
-)
 st.set_page_config(page_title ="Stock Analysis Dashboard",layout="wide",page_icon="📈")
 
 @st.cache_resource
@@ -50,8 +42,9 @@ def connection():
             password = os.getenv("SNOWFLAKE_PASSWORD"),
             account = os.getenv("SNOWFLAKE_ACCOUNT"),
             warehouse = os.getenv("SNOWFLAKE_WAREHOUSE"),
-            DATABASE = os.getenv("SNOWFLAKE_DATABASE"),
-            SCHEMA = os.getenv("SNOWFLAKE_SCHEMA"),
+            database = os.getenv("SNOWFLAKE_DATABASE"),
+            schema = os.getenv("SNOWFLAKE_SCHEMA"),
+            role = os.getenv("SNOWFLAKE_ROLE"),
             client_session_keep_alive=True
         )
     except Exception as e:
@@ -112,5 +105,56 @@ elif menu == "Hiệu Suất Cổ Phiếu (Daily Performance)":
             title=f"Tỷ lệ Lợi Nhuận Hằng Ngày Của {selected_ticker}",
             markers=True,line_shape="spline")
         st.plotly_chart(fig,use_container_width=True)
+    else:
+        st.error("Không có dữ liệu hoặc kết nối DB thất bại.")
+elif menu == "Hiệu Suất Ngành (Industry Performance)":
+    st.header("Hiệu Suất Theo Ngành")
+    st.markdown("Dữ liệu từ bảng `industry_performance`.")
+    df = load_data("SELECT * FROM industry_performance")
     
+    if not df.empty:
+        st.dataframe(df.head(10))
+
+        st.subheader("Tổng khối lượng giao dịch theo ngành")
+        df_group = df.groupby('industry_name')['total_trading_volume'].sum().reset_index()
+        df_group = df_group.sort_values(by='total_trading_volume',ascending=False)
+        fig = px.bar(df_group,x= 'industry_name',y='total_trading_volume',title="Total Trading Volume by Industry",color='total_trading_volume')
+        st.plotly_chart(fig,use_container_width=True)
+    else:
+        st.error("Không có dữ liệu hoặc kết nối DB thất bại.")
+elif menu == "Tâm Lý Tin Tức (Company Sentiment)":
+    st.header("Phân Tích Tâm Lý Dư Luận")
+    st.markdown("Dữ liệu từ bảng `company_sentiment`.")
+    df = load_data("SELECT * FROM company_sentiment ORDER BY date_key DESC;")
+    
+    if not df.empty:
+        st.dataframe(df.head(10))
+        
+        st.subheader("Phân Phối Điểm Tâm Lý (Sentiment Score)")
+        fig = px.box(df, x="ticker", y="avg_sentiment_score", 
+                     title="Phân Bố Điểm Tâm Lý Trung Bình Giữa Các Cổ Phiếu", color="ticker")
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.error("Không có dữ liệu hoặc kết nối DB thất bại.")
+
+elif menu == "Tác Động Tâm Lý Đến Giá (Sentiment Price Impact)":
+    st.header("Tác Động Của Tâm Lý Tin Tức Lên Giá Cổ Phiếu")
+    st.markdown("Dữ liệu từ bảng `sentiment_price_impact`.")
+    df = load_data("SELECT * FROM sentiment_price_impact ORDER BY date_key DESC;")
+
+    if not df.empty:
+        st.dataframe(df.head(10))
+        st.subheader("Mức Độ Tương Hợp: Sentiment Score vs Daily Return (%)")
+        fig=px.scatter(df,x='avg_sentiment_score',y='daily_return_percentage',
+                        color = 'sentiment_price_alignment',
+                        title="Biểu Đồ Phân Tán: Sự Tương Quan Giữa Tin Tức Và Giá",
+                        labels={"avg_sentiment_score": "Điểm Tâm Lý (Sentiment)", "daily_return_percentage": "Tỷ Lệ Lợi Nhuận (%)"},
+                        hover_data=["ticker", "date_key"])
+        fig.add_hline(y=0, line_dash="dash", line_color="gray")
+        fig.add_vline(x=0, line_dash="dash", line_color="gray")
+        st.plottly_chart(fig,use_container_width=True)
+    else:
+        st.error("Không có dữ liệu hoặc kết nối DB thất bại.")
+    
+
         
