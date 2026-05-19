@@ -14,7 +14,7 @@ import snowflake.connector
 def trans_par(tablename,columns,col_conflict,execution_date):
     load_dotenv('/usr/local/.env')
     logger = logging.getLogger(__name__)
-    current_date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    current_date = execution_date.strftime("%Y_%m_%d")
     logger.info("Connecting to snowflake!")
     conn = snowflake.connector.connect(
         user=os.getenv("SNOWFLAKE_USER"),
@@ -33,7 +33,7 @@ def trans_par(tablename,columns,col_conflict,execution_date):
     """
     query_copy_into_stage = f"""
         COPY INTO stock_schema.{tablename}_stg
-        FROM @s3_sto/parquet/{tablename}/{current_date}/{tablename}
+        FROM @s3_sto/parquet/{tablename}/{current_date}/{tablename}.parquet
         MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
         FILE_FORMAT = (TYPE = PARQUET);
     """
@@ -103,8 +103,8 @@ def transform_parquet_1(**kwargs):
 
     # trans table fama_classification
     tablename = 'fama_classification'
-    columns = ['fama_id','fama_industry','fama_sector']
-    col_conflict = ['fama_industry','fama_sector']
+    columns = ['fama_id','fama_industry']
+    col_conflict = ['fama_industry']
     trans_par(tablename,columns,col_conflict,execution_date)
 
     #trans table industry

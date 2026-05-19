@@ -21,7 +21,7 @@ with DAG (
     dag_id='Extracing_API_and_load_data_to_database',
     default_args = default_args,
     schedule = '0 0 * * *',
-    start_date = pendulum.datetime(2026,5,18,tz='Asia/Ho_Chi_Minh'),
+    start_date = pendulum.datetime(2026,5,16,tz='Asia/Ho_Chi_Minh'),
     catchup = True
 ) as dag:
     with TaskGroup(group_id='extract_phase') as extract_group:

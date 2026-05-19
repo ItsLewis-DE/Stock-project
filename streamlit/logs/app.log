@@ -1,0 +1,2 @@
+2026-05-19 14:08:49,966 - snowflake.connector.connection - INFO - Snowflake Connector for Python Version: 4.5.0, Python Version: 3.13.13, Platform: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41
+2026-05-19 14:08:49,967 - snowflake.connector.connection - INFO - Connecting to GLOBAL Snowflake domain

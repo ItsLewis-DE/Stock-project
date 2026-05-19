@@ -37,6 +37,7 @@ services:
       - "8501:8501"
     volumes:
       - ./streamlit:/app
+      - ./.env:/usr/local/.env
 
   my_new_postgres:
     image: postgres:15

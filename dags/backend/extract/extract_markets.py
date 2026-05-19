@@ -18,7 +18,7 @@ def extract_markets(**kwargs):
         logger.info("Extracting data .....")
         response  = requests.get(url,params = params,timeout =30 )
         response.raise_for_status()
-        data = response.json()['markets']
+        data = response.json()
         total = len(data)
         logger.info("Extracting data successfully!")
     except requests.exceptions.RequestException as e:
