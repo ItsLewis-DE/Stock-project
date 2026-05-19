@@ -147,7 +147,7 @@ extract_phase ─→ trans_and_load_1 ─→ trans_and_load_2 ─→ trans_and_l
 
 > Pipeline ELT chính: Extract → S3 → Snowflake.
 
-* **Tần suất**: Hàng ngày (`0 12 * * *`)
+* **Tần suất**: Hàng ngày (`0 0 * * *`)
 * **Luồng xử lý**:
 
 ```text
@@ -293,6 +293,3 @@ Sau khi khởi động thành công:
 
 ---
 
-## 📜 License
-
-This project is for educational and personal portfolio purposes.
