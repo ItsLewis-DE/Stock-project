@@ -20,20 +20,20 @@ default_args = {
 with DAG (
     dag_id='Extracing_API_and_load_data_to_database',
     default_args = default_args,
-    schedule = '0 0 1 * *',
+    schedule = '0 0 * * *',
     start_date = pendulum.datetime(2026,5,18,tz='Asia/Ho_Chi_Minh'),
     catchup = True
 ) as dag:
-    # with TaskGroup(group_id='extract_phase') as extract_group:
-    #     extract_companies_task = PythonOperator(
-    #         task_id = 'extract_companies',
-    #         python_callable = extract_companies
-    #     )
-    #     extract_markets_task = PythonOperator(
-    #         task_id = 'extract_markets',
-    #         python_callable=extract_markets
-    #     )
-    #     [extract_companies_task,extract_markets_task]
+    with TaskGroup(group_id='extract_phase') as extract_group:
+        extract_companies_task = PythonOperator(
+            task_id = 'extract_companies',
+            python_callable = extract_companies
+        )
+        extract_markets_task = PythonOperator(
+            task_id = 'extract_markets',
+            python_callable=extract_markets
+        )
+        [extract_companies_task,extract_markets_task]
     with TaskGroup(group_id = 'trans_and_load_1') as trans_and_load_1_group:
         trans_to_db_1_task = PythonOperator(
             task_id ='trans_to_db_1_task',
@@ -73,5 +73,4 @@ with DAG (
             python_callable = load_to_db_4
         )
         trans_to_db_4_task >>load_to_db_4_task
-    # extract_group >> 
-    trans_and_load_1_group >> trans_and_load_2_group >> trans_and_load_3_group >> trans_and_load_4_group
+    extract_group >> trans_and_load_1_group >> trans_and_load_2_group >> trans_and_load_3_group >> trans_and_load_4_group
