@@ -11,7 +11,7 @@ import os
 import pyarrow
 from sqlalchemy import create_engine
 import snowflake.connector
-def trans_par(tablename,columns,col_conflict):
+def trans_par(tablename,columns,col_conflict,execution_date):
     load_dotenv('/usr/local/.env')
     logger = logging.getLogger(__name__)
     current_date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
@@ -49,10 +49,12 @@ def trans_par(tablename,columns,col_conflict):
     
     # 3. Thay đổi mệnh đề USING: Thay vì dùng trực tiếp bảng _stg, 
     # chúng ta SELECT từ _stg và thêm một cột động chứa thời gian.
+    # Format execution_date for Snowflake
+    exec_date_str = execution_date.strftime("%Y-%m-%d %H:%M:%S")
     query_merge = f"""
         MERGE INTO stock_schema.{tablename} AS target
         USING (
-            SELECT *, DATEADD(day, -1,CONVERT_TIMEZONE('Asia/Ho_Chi_Minh', CURRENT_TIMESTAMP())::TIMESTAMP_NTZ) AS inserted_at_value 
+            SELECT *, '{exec_date_str}'::TIMESTAMP_NTZ AS inserted_at_value 
             FROM stock_schema.{tablename}_stg
         ) AS source
         ON {col_conflict_string}
@@ -83,51 +85,54 @@ def trans_par(tablename,columns,col_conflict):
     cursor.close()
     conn.close()
 
-def transform_parquet_1():
+def transform_parquet_1(**kwargs):
+    # Lấy logical_date (execution date) từ Airflow context
+    execution_date = kwargs['logical_date']
+    
     # trans table company
     tablename = 'company'
     col_conflict = ['ticker','cik']
     columns = ['company_id','company_name','ticker','cik','cusip','exchange_id','isDelisted','industry_id','location','currency','category','sic_code']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     #trans table exchange
     tablename = 'exchange'
     col_conflict = ['exchange_name']
     columns = ['exchange_id','exchange_name','region_id']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     # trans table fama_classification
     tablename = 'fama_classification'
     columns = ['fama_id','fama_industry','fama_sector']
     col_conflict = ['fama_industry','fama_sector']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     #trans table industry
     tablename = 'industry'
     columns = ['industry_id','industry_name','sector_name']
     col_conflict = ['industry_name']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     #trans table news
     tablename = 'news'
     columns = ['title','url','time_published','authors','summary','banner_image','source','category_within_source','source_domain','topics','overall_sentiment_score','overall_sentiment_label','ticker_sentiment']
     col_conflict = ['title']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     # #trans table ohlc
     tablename = 'ohlc'
     columns = ['T','v','vw','o','c','h','l','t_time','n']
     col_conflict = ['T','t_time']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     #trans table sic_classification
     tablename = 'sic_classification'
     columns = ['sic_code','sic_industry','sic_sector','fama_id']
     col_conflict = ['sic_code']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)
 
     #trans table region
     tablename = 'region'
     columns = ['region_id','region_name','market_type','local_open','local_close']
     col_conflict = ['region_name']
-    trans_par(tablename,columns,col_conflict)
+    trans_par(tablename,columns,col_conflict,execution_date)

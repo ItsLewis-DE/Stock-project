@@ -27,15 +27,16 @@ def read_newest_file(dirpath,extension):
 def trans_dataframe(df):
     return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(how='all')
 
-def df_to_file(df,dirname,filename):
+def df_to_file(df,dirname,filename,execution_date):
     logger = logging.getLogger(__name__)
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    date = execution_date.strftime("%Y_%m_%d")
     dirname = Path(dirname)
     dirname.mkdir(parents=True,exist_ok=True)
     df.to_json(f'{dirname}/{filename}_{date}.json',orient='records',lines=True)
     logger.info("Saved to file successfully!")
 
-def trans_to_db_1():
+def trans_to_db_1(**kwargs):
+    execution_date = kwargs['logical_date']
     dirpath = '/usr/local/data/raw/companies'
     extension = '.json'
     newest_file = read_newest_file(dirpath,extension)
@@ -43,13 +44,12 @@ def trans_to_db_1():
     #transform fama
 
     df = pd.read_json(newest_file)
-    df_fama = trans_dataframe(df[['famaIndustry','famaSector']])
+    df_fama = trans_dataframe(df[['famaIndustry']])
     df_fama = df.rename(columns={
-        'famaIndustry':'fama_industry',
-        'famaSector':'fama_sector'
+        'famaIndustry':'fama_industry'
     })
     dirname = '/usr/local/data/processed/fama_classification'
-    df_to_file(df_fama,dirname,'fama_processed')
+    df_to_file(df_fama,dirname,'fama_processed',execution_date)
     
     #transform industry
 
@@ -59,5 +59,5 @@ def trans_to_db_1():
         'sector':'sector_name'
     })
     dirname = '/usr/local/data/processed/industry'
-    df_to_file(df_industry,dirname,'industry_processed')
+    df_to_file(df_industry,dirname,'industry_processed',execution_date)
 

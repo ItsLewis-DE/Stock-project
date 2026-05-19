@@ -28,15 +28,16 @@ def read_newest_file(dirpath,extension):
 def trans_dataframe(df):
     return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(how='all')
 
-def df_to_file(df,dirname,filename):
+def df_to_file(df,dirname,filename,execution_date):
     logger = logging.getLogger(__name__)
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    date = execution_date.strftime("%Y_%m_%d")
     dirname = Path(dirname)
     dirname.mkdir(parents=True,exist_ok=True)
     df.to_json(f'{dirname}/{filename}_{date}.json',orient='records',lines=True)
 
     logger.info("Saved to file successfully!")
-def trans_to_db_2():
+def trans_to_db_2(**kwargs):
+    execution_date = kwargs['logical_date']
 
     #transform region
 
@@ -56,7 +57,7 @@ def trans_to_db_2():
     )
     path_to_file = '/usr/local/data/processed/region'
     filename = 'region_processed'
-    df_to_file(region_df,path_to_file,filename)
+    df_to_file(region_df,path_to_file,filename,execution_date)
 
     #transform sic_classification
 
@@ -64,7 +65,7 @@ def trans_to_db_2():
     extension = '.json'
     newest_file = read_newest_file(dirpath,extension)
     df = pd.read_json(newest_file)
-    sic_df = trans_dataframe(df[['sic','sicIndustry','sicSector','famaIndustry','famaSector']])
+    sic_df = trans_dataframe(df[['sic','sicIndustry','sicSector','famaIndustry']])
     sic_df['sicIndustry'].replace('\/','and',inplace = True)
     sic_df = sic_df.rename(columns={
         'sic':'sic_code',
@@ -86,10 +87,10 @@ def trans_to_db_2():
     engine = create_engine(db_url)
     query = " SELECT * FROM stock_schema.fama_classification"
     df_fama = pd.read_sql(query,engine)
-    sic_df = pd.merge(sic_df,df_fama,on = ['fama_industry','fama_sector'],how='inner')
+    sic_df = pd.merge(sic_df,df_fama,on = ['fama_industry'],how='inner')
     sic_df = sic_df[['sic_code','fama_id','sic_industry','sic_sector']]
     dirname = '/usr/local/data/processed/sic'
-    df_to_file(sic_df,dirname,'sic_processed')
+    df_to_file(sic_df,dirname,'sic_processed',execution_date)
 
 
 

@@ -4,9 +4,11 @@ import requests
 import os,logging
 from dotenv import load_dotenv
 
-def extract_companies():
+def extract_companies(**kwargs):
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
+    # Sử dụng logical_date từ Airflow context thay vì pendulum.now()
+    execution_date = kwargs['logical_date']
     exchanges = ['NYSE', 'NASDAQ', 'NYSEMKT', 'NYSEARCA', 'OTC', 'BATS', 'INDEX']
     result = []
     total =0
@@ -25,7 +27,7 @@ def extract_companies():
             raise
         result.extend(data)
         total += len(data)
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    date = execution_date.strftime("%Y_%m_%d")
     path = f'/usr/local/data/raw/companies/raw_companies_{date}.json'
     os.makedirs(os.path.dirname(path),exist_ok=True)
     with open(path,'w',encoding = 'utf-8') as file:

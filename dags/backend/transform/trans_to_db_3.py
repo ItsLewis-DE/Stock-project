@@ -26,15 +26,16 @@ def read_newest_file(dirpath,extension):
     return newest_file
 def trans_dataframe(df):
     return df.replace(r'^\s*$',np.nan,regex=True).drop_duplicates().dropna(how='all')
-def df_to_file(df,dirname,filename):
+def df_to_file(df,dirname,filename,execution_date):
     logger = logging.getLogger(__name__)
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    date = execution_date.strftime("%Y_%m_%d")
     dirname = Path(dirname)
     dirname.mkdir(parents=True,exist_ok=True)
     df.to_json(f'{dirname}/{filename}_{date}.json',orient='records',lines=True)
     logger.info("Saved to file successfully!")
 
-def trans_to_db_3():
+def trans_to_db_3(**kwargs):
+    execution_date = kwargs['logical_date']
     #exchange table
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
@@ -64,4 +65,4 @@ def trans_to_db_3():
     exchange_df = pd.merge(exchange_df, region_df,on='region_name',how='inner')
     exchange_df = exchange_df[['region_id','exchange_name']]
     dirname = '/usr/local/data/processed/exchange'
-    df_to_file(exchange_df,dirname,'exchange_processed')
+    df_to_file(exchange_df,dirname,'exchange_processed',execution_date)

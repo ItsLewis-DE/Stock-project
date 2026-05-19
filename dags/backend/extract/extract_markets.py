@@ -4,9 +4,11 @@ import requests
 import os,logging
 from dotenv import load_dotenv
 
-def extract_markets():
+def extract_markets(**kwargs):
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
+    # Sử dụng logical_date từ Airflow context thay vì pendulum.now()
+    execution_date = kwargs['logical_date']
     try:
         params = {
             'function':'MARKET_STATUS',
@@ -21,7 +23,7 @@ def extract_markets():
         logger.info("Extracting data successfully!")
     except requests.exceptions.RequestException as e:
         logger.exception(f"There is an error while extracting data from API : {e}")
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+    date = execution_date.strftime("%Y_%m_%d")
     path = f'/usr/local/data/raw/markets/raw_markets_{date}.json'
     os.makedirs(os.path.dirname(path),exist_ok=True)
     with open(path,"w",encoding = 'utf-8') as file:

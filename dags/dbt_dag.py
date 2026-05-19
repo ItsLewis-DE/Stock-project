@@ -19,11 +19,12 @@ profile_config = ProfileConfig(
 )
 execution_config=ExecutionConfig(dbt_executable_path=f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt")
 project_config = ProjectConfig("/usr/local/airflow/dags/dbt/stock_dbt")
+
 with DAG(
     dag_id = "dbt_dag",
-    schedule="@daily",
+    schedule=None,
     start_date = pendulum.datetime(2025,1,1,tz='Asia/Ho_Chi_Minh'),
-    catchup=False,
+    catchup=True,
     default_args = {"retries":1},
 ) as dag:
     staging = DbtTaskGroup(
