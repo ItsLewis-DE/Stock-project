@@ -2,8 +2,11 @@ import streamlit as st
 import snowflake.connector
 import pandas as pd
 from pathlib import Path
+import plotly.express as px
 import os
 import logging
+from dotenv import load_dotenv
+load_dotenv('/usr/local/.env')
 _APP_DIR= Path(__file__).resolve().parent
 _DEFAULT_LOG_FILE = _APP_DIR / "logs" / "app.log"
 log_dir = _APP_DIR / "logs"
@@ -63,7 +66,7 @@ def load_data(query: str):
         df.columns = [col.lower() for col in df.columns]
         return df
     except Exception as e:
-        st.error(f"Loi truy van:" {e})
+        st.error(f"Loi truy van: {e}")
         return pd.DataFrame()
 
 st.title("Stock Data Analytics Dashboard")
@@ -152,7 +155,7 @@ elif menu == "Tác Động Tâm Lý Đến Giá (Sentiment Price Impact)":
                         hover_data=["ticker", "date_key"])
         fig.add_hline(y=0, line_dash="dash", line_color="gray")
         fig.add_vline(x=0, line_dash="dash", line_color="gray")
-        st.plottly_chart(fig,use_container_width=True)
+        st.plotly_chart(fig,use_container_width=True)
     else:
         st.error("Không có dữ liệu hoặc kết nối DB thất bại.")
     

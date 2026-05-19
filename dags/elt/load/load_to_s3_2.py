@@ -39,7 +39,7 @@ def load_parquet_to_s3(dirpath,filename,extension):
         region_name = os.getenv('REGION')
     )
     logger.info("Connected successfully!")
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=1).strftime("%Y_%m_%d")
+    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
     s3.upload_file(
         parquet_newest_file,
         'stock-bucket-phong-2026',
@@ -47,47 +47,47 @@ def load_parquet_to_s3(dirpath,filename,extension):
     )
     logger.info("Parquet saved to S3")
 def load_to_s3_2():
-    # #company file
-    # dirpath = '/usr/local/data/parquet/company'
-    # extension = '.parquet'
-    # filename = 'company'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    #company file
+    dirpath = '/usr/local/data/parquet/company'
+    extension = '.parquet'
+    filename = 'company'
+    load_parquet_to_s3(dirpath,filename,extension)
     
-    # #exchange file
-    # dirpath = '/usr/local/data/parquet/exchange'
-    # extension = '.parquet'
-    # filename = 'exchange'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    #exchange file
+    dirpath = '/usr/local/data/parquet/exchange'
+    extension = '.parquet'
+    filename = 'exchange'
+    load_parquet_to_s3(dirpath,filename,extension)
 
-    # #fama_classification
-    # dirpath = '/usr/local/data/parquet/fama_classification'
-    # extension = '.parquet'
-    # filename = 'fama_classification'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    #fama_classification
+    dirpath = '/usr/local/data/parquet/fama_classification'
+    extension = '.parquet'
+    filename = 'fama_classification'
+    load_parquet_to_s3(dirpath,filename,extension)
 
-    # # industry file
-    # dirpath = '/usr/local/data/parquet/industry'
-    # extension = '.parquet'
-    # filename = 'industry'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    # industry file
+    dirpath = '/usr/local/data/parquet/industry'
+    extension = '.parquet'
+    filename = 'industry'
+    load_parquet_to_s3(dirpath,filename,extension)
 
-    # #news file
-    # dirpath = '/usr/local/data/parquet/news'
-    # extension = '.parquet'
-    # filename = 'news'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    #news file
+    dirpath = '/usr/local/data/parquet/news'
+    extension = '.parquet'
+    filename = 'news'
+    load_parquet_to_s3(dirpath,filename,extension)
 
-    # #ohlc file
-    # dirpath = '/usr/local/data/parquet/ohlc'
-    # extension = '.parquet'
-    # filename = 'ohlc'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    #ohlc file
+    dirpath = '/usr/local/data/parquet/ohlc'
+    extension = '.parquet'
+    filename = 'ohlc'
+    load_parquet_to_s3(dirpath,filename,extension)
 
-    # #region
-    # dirpath = '/usr/local/data/parquet/region'
-    # extension = '.parquet'
-    # filename = 'region'
-    # load_parquet_to_s3(dirpath,filename,extension)
+    #region
+    dirpath = '/usr/local/data/parquet/region'
+    extension = '.parquet'
+    filename = 'region'
+    load_parquet_to_s3(dirpath,filename,extension)
 
     #sic_classification
     dirpath = '/usr/local/data/parquet/sic'

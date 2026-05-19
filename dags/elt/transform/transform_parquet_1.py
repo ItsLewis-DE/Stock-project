@@ -14,7 +14,7 @@ import snowflake.connector
 def trans_par(tablename,columns,col_conflict):
     load_dotenv('/usr/local/.env')
     logger = logging.getLogger(__name__)
-    current_date = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=2).strftime("%Y_%m_%d")
+    current_date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
     logger.info("Connecting to snowflake!")
     conn = snowflake.connector.connect(
         user=os.getenv("SNOWFLAKE_USER"),

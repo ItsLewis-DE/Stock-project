@@ -10,13 +10,13 @@ Dữ liệu di chuyển qua các tầng ETL/ELT khép kín từ các API thô đ
 
 ```mermaid
 graph TD
-    subgraph Data Sources & Ingestion
+    subgraph ds[Data Sources & Ingestion]
         A1[Grouped OHLC API - Massive]
         A2[News Sentiment API - Alpha Vantage]
         A3[(Local Postgres - Metadata)]
     end
 
-    subgraph Step 1: Orchestration & Data Lake (Airflow & S3)
+    subgraph step1[Step 1: Orchestration & Data Lake - Airflow & S3]
         B1[extract_ohlc.py] -->|Raw JSON| C1[(Raw Data Local)]
         B2[extract_news.py] -->|Raw JSON| C1
         
@@ -26,17 +26,17 @@ graph TD
         C2 -->|Upload via boto3| D[AWS S3 Bucket]
     end
 
-    subgraph Step 2: Data Warehousing (Snowflake DWH)
+    subgraph step2[Step 2: Data Warehousing - Snowflake DWH]
         D -->|COPY INTO stg table| E[Snowflake Staging Tables]
         E -->|Idempotent MERGE| F[(Snowflake Core Tables)]
     end
 
-    subgraph Step 3: Transformation & Analytics (dbt Core)
+    subgraph step3[Step 3: Transformation & Analytics - dbt Core]
         F -->|dbt Run| G[dbt Staging Models]
         G -->|dbt Run| H[dbt Marts Analytics]
     end
 
-    subgraph Step 4: Data Visualization (Streamlit)
+    subgraph step4[Step 4: Data Visualization - Streamlit]
         H -->|snowflake-connector-python| I[Streamlit Dashboard Web App]
     end
 

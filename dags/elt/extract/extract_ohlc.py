@@ -18,7 +18,7 @@ def save_data_to_file(dirpath,data,filename,total):
 def extract_ohlc():
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
-    yesterday = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=2).strftime("%Y-%m-%d")
+    yesterday = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=1).strftime("%Y-%m-%d")
     try :
         url = f'https://api.massive.com/v2/aggs/grouped/locale/us/market/stocks/{yesterday}'
         params = {
