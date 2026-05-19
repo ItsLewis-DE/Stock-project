@@ -19,7 +19,7 @@ LOG_FILE = _DEFAULT_LOG_FILE
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     filename=LOG_FILE,
-                    filemod="a"
+                    filemode="a"
 )
 logger = logging.getLogger("app")
 
@@ -71,7 +71,7 @@ def load_data(query: str):
 
 st.title("Stock Data Analytics Dashboard")
 st.markdown("Dashboard phân tích thị trường chứng khoán, tổng hợp từ các bảng dbt.")
-menu = st.slidebar.selectbox(
+menu = st.sidebar.selectbox(
     "Chọn Bảng Phân Tích (Select View)",
     [
         "Tổng quan (Overview)", 
@@ -99,7 +99,7 @@ elif menu == "Hiệu Suất Cổ Phiếu (Daily Performance)":
     if not df.empty:
         st.dataframe(df.head(10))
         st.subheader("Biến động Lợi Nhuận (Daily Return %)")
-        tickers = df['ticker'],unique()
+        tickers = df['ticker'].unique()
         selected_ticker = st.selectbox("Chọn Mã Cổ Phiếu (Ticker):", tickers)
 
         df_filtered = df[df['ticker']==selected_ticker].sort_values(by = 'date_key')

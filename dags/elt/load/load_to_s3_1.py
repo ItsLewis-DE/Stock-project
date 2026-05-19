@@ -27,8 +27,8 @@ def read_newest_file(dirpath,extension):
     )
     return newest_file
 
-def trans_data_into_parquet(dirpath,filename,savedirpath):
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+def trans_data_into_parquet(dirpath,filename,savedirpath,execution_date):
+    date = execution_date.strftime("%Y_%m_%d")
     dirpath = Path(dirpath)
     savedirpath = Path(savedirpath)
     savedirpath.mkdir(parents=True,exist_ok=True)
@@ -43,8 +43,8 @@ def trans_data_into_parquet(dirpath,filename,savedirpath):
         engine = "pyarrow",
         index = False
     )
-def trans_df_into_parquet(df,filename,savedirpath):
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime("%Y_%m_%d")
+def trans_df_into_parquet(df,filename,savedirpath,execution_date):
+    date = execution_date.strftime("%Y_%m_%d")
     savedirpath = Path(savedirpath)
     savedirpath.mkdir(parents=True,exist_ok=True)
     savepath = savedirpath/f"{filename}_{date}.parquet"
@@ -60,22 +60,23 @@ def trans_ohlc(dirpath,savepath):
         't':'t_time'
     })
     df.to_json(savepath,indent=2,orient='records')
-def load_to_s3_1():
+def load_to_s3_1(**kwargs):
+    execution_date = kwargs['logical_date']
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
     # load ohlc
     dirpath = '/usr/local/data/raw/ohlc'
     filename = 'ohlc'
     savedirpath = '/usr/local/data/parquet/ohlc'
-    savepath = f'/usr/local/data/raw/ohlc/raw_ohlc_2026_05_14.json'
+    savepath = f'/usr/local/data/raw/ohlc/raw_ohlc_{execution_date.strftime("%Y_%m_%d")}.json'
     trans_ohlc(dirpath,savepath)
-    trans_data_into_parquet(dirpath,filename,savedirpath)   
+    trans_data_into_parquet(dirpath,filename,savedirpath,execution_date)   
 
     #load news
     dirpath = '/usr/local/data/raw/news'
     filename = 'news'
     savedirpath = '/usr/local/data/parquet/news'
-    trans_data_into_parquet(dirpath,filename,savedirpath)
+    trans_data_into_parquet(dirpath,filename,savedirpath,execution_date)
 
     #load company
     logger.info("Connecting to database")
@@ -91,7 +92,7 @@ def load_to_s3_1():
     df_company = pd.read_sql(query,engine) 
     filename = 'company'
     savedirpath = '/usr/local/data/parquet/company'
-    trans_df_into_parquet(df_company,filename,savedirpath)
+    trans_df_into_parquet(df_company,filename,savedirpath,execution_date)
 
     #load exchange
     logger.info("Connecting to database")
@@ -107,7 +108,7 @@ def load_to_s3_1():
     df_company = pd.read_sql(query,engine) 
     filename = 'exchange'
     savedirpath = '/usr/local/data/parquet/exchange'
-    trans_df_into_parquet(df_company,filename,savedirpath)
+    trans_df_into_parquet(df_company,filename,savedirpath,execution_date)
 
 
     #load fama_classification
@@ -124,7 +125,7 @@ def load_to_s3_1():
     df_company = pd.read_sql(query,engine) 
     filename = 'fama_classification'
     savedirpath = '/usr/local/data/parquet/fama_classification'
-    trans_df_into_parquet(df_company,filename,savedirpath)
+    trans_df_into_parquet(df_company,filename,savedirpath,execution_date)
 
     #load industry
     logger.info("Connecting to database")
@@ -140,7 +141,7 @@ def load_to_s3_1():
     df_company = pd.read_sql(query,engine) 
     filename = 'industry'
     savedirpath = '/usr/local/data/parquet/industry'
-    trans_df_into_parquet(df_company,filename,savedirpath)
+    trans_df_into_parquet(df_company,filename,savedirpath,execution_date)
 
     #load region
     logger.info("Connecting to database")
@@ -156,7 +157,7 @@ def load_to_s3_1():
     df_company = pd.read_sql(query,engine) 
     filename = 'region'
     savedirpath = '/usr/local/data/parquet/region'
-    trans_df_into_parquet(df_company,filename,savedirpath)
+    trans_df_into_parquet(df_company,filename,savedirpath,execution_date)
 
     #load sic_classification
     logger.info("Connecting to database")
@@ -172,7 +173,7 @@ def load_to_s3_1():
     df_company = pd.read_sql(query,engine) 
     filename = 'sic_classification'
     savedirpath = '/usr/local/data/parquet/sic'
-    trans_df_into_parquet(df_company,filename,savedirpath)
+    trans_df_into_parquet(df_company,filename,savedirpath,execution_date)
 
 
 

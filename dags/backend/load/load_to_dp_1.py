@@ -75,7 +75,7 @@ def load_to_db_1():
         data = [json.loads(line) for line in file if line.strip()]
     schema = 'stock_schema'
     col_conflict = ['fama_industry']
-    load_data_into_db(data,'fama_classification',['fama_industry','fama_sector'],schema,col_conflict)
+    load_data_into_db(data,'fama_classification',['fama_industry'],schema,col_conflict)
 
     #industry table
 

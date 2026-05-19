@@ -5,9 +5,9 @@ import os,logging
 from pathlib import Path
 from dotenv import load_dotenv
 import time
-def save_data_to_file(dirpath,data,filename,total):
+def save_data_to_file(dirpath,data,filename,total,execution_date):
     logger = logging.getLogger(__name__)
-    date = pendulum.now(tz='Asia/Ho_Chi_Minh').strftime('%Y_%m_%d')
+    date = execution_date.strftime('%Y_%m_%d')
     dirpath = Path(dirpath)
     dirpath.mkdir(parents =True,exist_ok=True)
     filepath = dirpath/f"{filename}_{date}.json"
@@ -15,10 +15,11 @@ def save_data_to_file(dirpath,data,filename,total):
         json.dump(data,file,indent=2)
     logger.info(f"Saved {total} to file successfully!")
 
-def extract_ohlc():
+def extract_ohlc(**kwargs):
+    execution_date = kwargs['logical_date']
     logger = logging.getLogger(__name__)
     load_dotenv('/usr/local/.env')
-    yesterday = pendulum.now(tz='Asia/Ho_Chi_Minh').subtract(days=1).strftime("%Y-%m-%d")
+    yesterday = execution_date.subtract(days=1).strftime("%Y-%m-%d")
     try :
         url = f'https://api.massive.com/v2/aggs/grouped/locale/us/market/stocks/{yesterday}'
         params = {
@@ -36,4 +37,4 @@ def extract_ohlc():
     logger.info("Extracting data successfully!")
     dirpath = '/usr/local/data/raw/ohlc'
     filename = 'raw_ohlc'
-    save_data_to_file(dirpath,data,filename,total)    
+    save_data_to_file(dirpath,data,filename,total,execution_date)    
